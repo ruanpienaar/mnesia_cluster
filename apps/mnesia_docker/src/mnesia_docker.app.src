@@ -1,0 +1,14 @@
+{application, mnesia_docker,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  sasl,
+                  mnesia
+                 ]},
+  {mod, { mnesia_docker_app, []}},
+  {env, []}
+ ]}.
