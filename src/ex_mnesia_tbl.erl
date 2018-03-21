@@ -39,8 +39,13 @@ create_table(Nodes) ->
             mnesia:info(),
             io:format("[~p] Going to create table with ~p opts~n",
                       [?MODULE, Opts]),
-            {atomic, ok} = mnesia:create_table(?MODULE, Opts),
-            io:format("Table ~p created ", [?MODULE]);
+            case mnesia:create_table(?MODULE, Opts) of
+                {aborted,{already_exists,test}} ->
+                    io:format("Table ~p was already created,"
+                              " likely by another node ", [?MODULE]);
+                {atomic, ok} ->
+                    io:format("Table ~p created ", [?MODULE])
+            end;
         C:E ->
             throw({?MODULE, create_table, C, E, erlang:get_stacktrace()})
     end.

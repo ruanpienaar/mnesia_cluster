@@ -20,3 +20,9 @@ dialyzer: compile
 
 rebar3:
 	@ls rebar3 || wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
+	
+console:
+	@export RELX_REPLACE_OS_VARS=true
+	@export NODE_NAME="node_name@127.0.0.1"
+	@export COOKIE="cookie"
+	@./_build/default/rel/mnesia_docker/bin/mnesia_docker console
