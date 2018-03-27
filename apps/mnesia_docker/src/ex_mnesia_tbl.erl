@@ -39,7 +39,14 @@ create_table(Nodes) ->
             mnesia:info(),
             io:format("[~p] Going to create table with ~p opts~n",
                       [?MODULE, Opts]),
-            {atomic, ok} = mnesia:create_table(?MODULE, Opts),
+            % Interesting race condition, where this returns already created.
+            % Most likely from the others nodes adding table copies on the running_db_nodes.
+            case mnesia:create_table(?MODULE, Opts) of
+                {atomic, ok} ->
+                    ok;
+                {aborted, {already_exists, ?MODULE}} ->
+                    ok
+            end,
             io:format("Table ~p created ", [?MODULE]);
         C:E ->
             throw({?MODULE, create_table, C, E, erlang:get_stacktrace()})
