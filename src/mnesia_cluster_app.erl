@@ -11,8 +11,9 @@
 
 start(_StartType, _StartArgs) ->
     case mnesia_cluster_sup:start_link() of
-        {ok, _Pid} ->
-            mnesia_cluster:start();
+        {ok, Pid} ->
+            mnesia_cluster:start(),
+            {ok, Pid};
         E ->
             E
     end.
