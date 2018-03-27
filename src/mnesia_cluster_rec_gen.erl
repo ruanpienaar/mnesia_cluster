@@ -1,4 +1,4 @@
--module(mnesia_docker_rec_gen).
+-module(mnesia_cluster_rec_gen).
 -export([
     start_link/0,
     produce_records/0,
@@ -34,7 +34,7 @@ handle_cast(stop_producers, #{ pids := Pids } = State) ->
     ok = lists:foreach(fun(Pid) ->
         true = erlang:exit(Pid, kill)
     end, Pids),
-    {noreply, #{ pids => [] }};
+    {noreply, State#{ pids => [] }};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 

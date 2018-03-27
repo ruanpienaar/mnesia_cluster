@@ -1,4 +1,4 @@
--module(mnesia_docker_sup).
+-module(mnesia_cluster_sup).
 
 -behaviour(supervisor).
 
@@ -24,7 +24,7 @@ start_link() ->
 
 init([]) ->
     {ok, { {one_for_one, 5, 10}, [
-        ?CHILD(mnesia_docker_node_mon, worker),
-        ?CHILD(mnesia_docker_rec_gen, worker)
+        ?CHILD(mnesia_cluster_node_mon, worker),
+        ?CHILD(mnesia_cluster_rec_gen, worker)
     ]} }.
 

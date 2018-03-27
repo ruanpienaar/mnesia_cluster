@@ -1,4 +1,4 @@
--module(mnesia_docker_app).
+-module(mnesia_cluster_app).
 
 -behaviour(application).
 
@@ -10,9 +10,9 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    case mnesia_docker_sup:start_link() of
-        {ok, Pid} ->
-            mnesia_docker:start();
+    case mnesia_cluster_sup:start_link() of
+        {ok, _Pid} ->
+            mnesia_cluster:start();
         E ->
             E
     end.

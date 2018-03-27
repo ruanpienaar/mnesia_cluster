@@ -1,4 +1,4 @@
-{application, mnesia_docker,
+{application, mnesia_cluster,
  [
   {description, ""},
   {vsn, "1"},
@@ -9,6 +9,6 @@
                   sasl,
                   mnesia
                  ]},
-  {mod, { mnesia_docker_app, []}},
+  {mod, { mnesia_cluster_app, []}},
   {env, []}
  ]}.

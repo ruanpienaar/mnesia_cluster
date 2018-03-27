@@ -25,4 +25,4 @@ console:
 	@export RELX_REPLACE_OS_VARS=true
 	@export NODE_NAME="node_name@127.0.0.1"
 	@export COOKIE="cookie"
-	@./_build/default/rel/mnesia_docker/bin/mnesia_docker console
+	@./_build/default/rel/mnesia_cluster/bin/mnesia_cluster console

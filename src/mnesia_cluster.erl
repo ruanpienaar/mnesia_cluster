@@ -1,4 +1,4 @@
--module(mnesia_docker).
+-module(mnesia_cluster).
 -export([
     start/0,
     add_node/1,
@@ -10,15 +10,12 @@
 %% TODO: Mnesia DIR should be deleted when nodes removed, or disapeared.
 
 start() ->
-    {ok, _} = application:ensure_all_started(mnesia_docker),
-
-    % ok = mnesia_docker_node_mon:add_node(node(), erlang:get_cookie())
-    {_, []} = rpc:multicall(mnesia_docker_node_mon, add_node, [node(), erlang:get_cookie()]),
-
+    % {ok, _} = application:ensure_all_started(mnesia_cluster),
+    % ok = mnesia_cluster_node_mon:add_node(node(), erlang:get_cookie())
+    {_, []} = rpc:multicall(mnesia_cluster_node_mon, add_node, [node(), erlang:get_cookie()]),
     % none = mnesia:set_debug_level(verbose),
     ExtraNodes = lists:sort(nodes()),
     io:format("[~p] Extra Nodes! ~p ~n", [?MODULE, ExtraNodes]),
-
     %% Starting mnesia on cluster
     ok = mnesia_start_on_cluster(ExtraNodes),
     % Moved Nodes here.
@@ -26,7 +23,7 @@ start() ->
     % kernel's sync_nodes produces a diff value at startup...
     Nodes = lists:sort([node() | nodes()]),
     io:format("[~p] Nodes! ~p ~n", [?MODULE, Nodes]),
-    {SS, _} = rpc:multicall(application, get_env, [mnesia_docker, system_started]),
+    {SS, _} = rpc:multicall(application, get_env, [mnesia_cluster, system_started]),
     case lists:any(fun({ok,true}) -> true; (_) -> false end, SS) of
     % At least 1 node has started when the system was installed
         true ->
@@ -57,13 +54,12 @@ rest_of_setup(Nodes, ExtraNodes) ->
         true
     ),
     io:format("[~p] All db nodes running ~n", [?MODULE]),
-
     %% Added db nodes step check
-    ok = application:set_env(mnesia_docker, added_running_db_nodes, true),
+    ok = application:set_env(mnesia_cluster, added_running_db_nodes, true),
     ok = poll(
         10000,
         fun() ->
-            {E, _B} = rpc:multicall(application, get_env, [mnesia_docker, added_running_db_nodes]),
+            {E, _B} = rpc:multicall(application, get_env, [mnesia_cluster, added_running_db_nodes]),
             lists:all(fun({ok, true}) ->
                 true;
                          (_) ->
@@ -74,7 +70,6 @@ rest_of_setup(Nodes, ExtraNodes) ->
         true
     ),
     io:format("[~p] All nodes step set env ~n", [?MODULE]),
-
     %% Stop mnesia on cluster
     io:format("[~p] Stopping mnesia before schema creation ~n", [?MODULE]),
     stopped = mnesia:stop(),
@@ -88,7 +83,6 @@ rest_of_setup(Nodes, ExtraNodes) ->
         )
     end, ExtraNodes),
     io:format("[~p] Mnesia is stopped everywhere~n", [?MODULE]),
-
     %% Schema ( i think only 1 node has to create it... )
     io:format("[~p] ~p~n", [?MODULE, mnesia:system_info(all)]),
     case mnesia:create_schema(Nodes) of
@@ -101,13 +95,12 @@ rest_of_setup(Nodes, ExtraNodes) ->
             io:format("[~p] Schema Create failed ~p~n", [?MODULE, EEE])
             % exit(2)
     end,
-
     %% Schema Created step
-    ok = application:set_env(mnesia_docker, schema_created, true),
+    ok = application:set_env(mnesia_cluster, schema_created, true),
     ok = poll(
         10000,
         fun() ->
-            {E, _B} = rpc:multicall(application, get_env, [mnesia_docker, schema_created]),
+            {E, _B} = rpc:multicall(application, get_env, [mnesia_cluster, schema_created]),
             lists:all(fun({ok, true}) ->
                 true;
                          (_) ->
@@ -118,16 +111,14 @@ rest_of_setup(Nodes, ExtraNodes) ->
         true
     ),
     io:format("[~p] Schema Created step check done ~n", [?MODULE]),
-
     %% Starting mnesia on cluster
     ok = mnesia_start_on_cluster(ExtraNodes),
-
     %% Startup after schema Created step
-    ok = application:set_env(mnesia_docker, startup_after_schema_create, true),
+    ok = application:set_env(mnesia_cluster, startup_after_schema_create, true),
     ok = poll(
         10000,
         fun() ->
-            {E, _B} = rpc:multicall(application, get_env, [mnesia_docker, startup_after_schema_create]),
+            {E, _B} = rpc:multicall(application, get_env, [mnesia_cluster, startup_after_schema_create]),
             lists:all(fun({ok, true}) ->
                 true;
                          (_) ->
@@ -138,7 +129,6 @@ rest_of_setup(Nodes, ExtraNodes) ->
         true
     ),
     io:format("[~p] Startup after Schema Created step check done ~n", [?MODULE]),
-
     % %% Tables
     MnesiaTbls = [ex_mnesia_tbl],
     % TblOpts = [],
@@ -147,7 +137,7 @@ rest_of_setup(Nodes, ExtraNodes) ->
     end, MnesiaTbls),
     ok = mnesia:wait_for_tables(MnesiaTbls, infinity),
     io:format("[~p] Mnesia wait_for_tables completed ... ~n", [?MODULE]),
-    ok = application:set_env(mnesia_docker, system_started, true),
+    ok = application:set_env(mnesia_cluster, system_started, true),
     mnesia:info().
 
 poll(C, F, Expected) when C > 0 ->
@@ -251,10 +241,10 @@ do_add_node(Node, Nodes, ExtraNodes) ->
     ok = mnesia:wait_for_tables(MnesiaTbls, infinity),
     io:format("[~p] Mnesia wait_for_tables completed ... ~n", [?MODULE]),
     % Needed for startup.
-    ok = application:set_env(mnesia_docker, added_running_db_nodes, true),
-    ok = application:set_env(mnesia_docker, schema_created, true),
-    ok = application:set_env(mnesia_docker, startup_after_schema_create, true),
-    ok = application:set_env(mnesia_docker, system_started, true),
+    ok = application:set_env(mnesia_cluster, added_running_db_nodes, true),
+    ok = application:set_env(mnesia_cluster, schema_created, true),
+    ok = application:set_env(mnesia_cluster, startup_after_schema_create, true),
+    ok = application:set_env(mnesia_cluster, system_started, true),
     mnesia:info().
 
 %% @doc Start mnesia on all other nodes ( from node() ).

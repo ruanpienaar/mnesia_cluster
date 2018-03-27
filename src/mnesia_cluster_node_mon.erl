@@ -1,4 +1,4 @@
--module(mnesia_docker_node_mon).
+-module(mnesia_cluster_node_mon).
 
 -export([
     start_link/0,

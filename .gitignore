@@ -11,3 +11,10 @@ rel/example_project
 rebar.lock
 rebar3
 _build
+a/Mnesia/
+a/log/*
+b/Mnesia/
+b/log/*
+c/Mnesia/
+c/log/*
+log/*

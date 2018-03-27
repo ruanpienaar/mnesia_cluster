@@ -18,9 +18,13 @@
 %% CRUD
 -export([
     create/2,
+    dirty_create/2,
     read/1,
+    dirty_read/1,
     update/2,
+    dirty_update/2,
     delete/1,
+    dirty_delete/1,
     new/2
 ]).
 
@@ -76,7 +80,7 @@ dirty_read(Key) ->
 update(Key, NewValue) ->
     create(Key, NewValue).
 
-update_dirty(Key, NewValue) ->
+dirty_update(Key, NewValue) ->
     dirty_create(Key, NewValue).
 
 delete(Key) ->
