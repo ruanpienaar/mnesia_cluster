@@ -130,12 +130,12 @@ rest_of_setup(Nodes, ExtraNodes) ->
     ),
     io:format("[~p] Startup after Schema Created step check done ~n", [?MODULE]),
     % %% Tables
-    MnesiaTbls = [ex_mnesia_tbl],
+    Tables = application:get_env(mnesia_cluster, tables, []),
     % TblOpts = [],
     ok = lists:foreach(fun(Tbl) ->
         Tbl:create_table(Nodes)
-    end, MnesiaTbls),
-    ok = mnesia:wait_for_tables(MnesiaTbls, infinity),
+    end, Tables),
+    ok = mnesia:wait_for_tables(Tables, infinity),
     io:format("[~p] Mnesia wait_for_tables completed ... ~n", [?MODULE]),
     ok = application:set_env(mnesia_cluster, system_started, true),
     mnesia:info().
@@ -227,7 +227,7 @@ do_add_node(Node, Nodes, ExtraNodes) ->
     end,
 
     % %% Tables
-    MnesiaTbls = [ex_mnesia_tbl],
+    Tables = application:get_env(mnesia_cluster, tables, []),
     % TblOpts = [],
     ok = lists:foreach(fun(Tbl) ->
         Tbl:create_table(Nodes),
@@ -237,8 +237,8 @@ do_add_node(Node, Nodes, ExtraNodes) ->
             {aborted, {already_exists, Tbl, Node}} ->
                 ok
         end
-    end, MnesiaTbls),
-    ok = mnesia:wait_for_tables(MnesiaTbls, infinity),
+    end, Tables),
+    ok = mnesia:wait_for_tables(Tables, infinity),
     io:format("[~p] Mnesia wait_for_tables completed ... ~n", [?MODULE]),
     % Needed for startup.
     ok = application:set_env(mnesia_cluster, added_running_db_nodes, true),
@@ -267,7 +267,7 @@ mnesia_start_on_cluster(ExtraNodes) ->
 %% @end
 
 remove_node(Node) ->
-    Tables = [ex_mnesia_tbl],
+    Tables = application:get_env(mnesia_cluster, tables, []),
     RN = mnesia:system_info(running_db_nodes),
     case lists:member(Node, RN) of
         true ->
