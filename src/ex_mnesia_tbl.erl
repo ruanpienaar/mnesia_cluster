@@ -46,7 +46,7 @@ create_table(Nodes) ->
             % Interesting race condition, where this returns already created.
             % Most likely from the others nodes adding table copies on the running_db_nodes.
             case mnesia:create_table(?MODULE, Opts) of
-                {aborted,{already_exists,test}} ->
+                {aborted, {already_exists, ?MODULE}} ->
                     io:format("Table ~p was already created,"
                               " likely by another node ", [?MODULE]);
                 {atomic, ok} ->
