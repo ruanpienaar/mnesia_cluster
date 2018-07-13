@@ -8,6 +8,7 @@ This repo serves as a exploratory exercise with mnesia and a cluster of nodes.
 $ export NODENAME=node
 $ export COOKIE=cookie
 $ export MNESIA_DIR=Mnesia
+$ export RELX_REPLACE_OS_VARS=true
 $ make
 $ ./_build/default/rel/mnesia_cluster/bin/mnesia_cluster console
 ```
