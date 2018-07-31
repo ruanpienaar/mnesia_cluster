@@ -2,6 +2,12 @@
 
 This repo serves as a exploratory exercise with mnesia and a cluster of nodes.
 
+## Dockerfile and other scripts
+[mnesia_docker_cluster](https://github.com/ruanpienaar/docker_files/tree/master/erlang/mnesia_docker_cluster)
+
+## Docker image / Docker compose ( 3 node cluster )
+https://hub.docker.com/r/ruanpienaar/mnesia_docker_cluster_example/
+
 ## Running locally
 
 ```
